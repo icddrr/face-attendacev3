@@ -1,33 +1,53 @@
 @echo off
-title ระบบเช็คชื่อ Face Recognition - กองแผนงาน
+chcp 65001 >nul
+echo ================================================
+echo 🚀 Face Attendance System
+echo ================================================
 
-echo.
-echo  ╔══════════════════════════════════════════════╗
-echo  ║       ระบบเช็คชื่อ Face Recognition          ║
-echo  ║              กองแผนงาน                      ║
-echo  ╚══════════════════════════════════════════════╝
-echo.
+cd /d "%~dp0"
 
-echo [INFO] กำลังเริ่มระบบ...
+echo [1/3] ตรวจสอบ Virtual Environment...
+if not exist venv\Scripts\activate.bat (
+    echo ❌ ERROR: Virtual Environment ไม่พบ
+    echo กรุณารัน install.bat ก่อน
+    pause
+    exit /b 1
+)
 
+echo ✅ พบ Virtual Environment
 call venv\Scripts\activate.bat
 
-echo [INFO] เริ่ม Backend Server...
+echo.
+echo [2/3] ตรวจสอบ Dependencies...
+python -c "import flask, cv2, numpy, pyodbc" 2>nul
+if errorlevel 1 (
+    echo ❌ ERROR: Dependencies ไม่ครบถ้วน
+    echo กรุณารัน install.bat อีกครั้ง
+    pause
+    exit /b 1
+)
+echo ✅ Dependencies พร้อม
+
+echo.
+echo [3/3] เริ่มต้นเซิร์ฟเวอร์...
+if not exist backend\app.py (
+    echo ❌ ERROR: ไม่พบไฟล์ backend\app.py
+    echo กรุณาตรวจสอบโครงสร้างโปรเจค
+    pause
+    exit /b 1
+)
+
+echo.
+echo ================================================
+echo 🌐 เซิร์ฟเวอร์กำลังรัน...
+echo 📱 เปิด: http://localhost:5000
+echo 🛑 หยุด: กด Ctrl+C
+echo ================================================
+echo.
+
 cd backend
-start "Backend Server" python app.py
-
-echo [INFO] รอ Backend เริ่มทำงาน...
-timeout /t 3
-
-echo [INFO] เปิด Frontend...
-start "" "..\index.html"
+python app.py
 
 echo.
-echo ✅ ระบบพร้อมใช้งาน!
-echo.
-echo Backend: http://localhost:5000
-echo Frontend: เปิดไฟล์ HTML แล้ว
-echo.
-echo กด Ctrl+C เพื่อหยุดระบบ
-echo.
+echo ระบบหยุดทำงานแล้ว
 pause
